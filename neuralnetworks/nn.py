@@ -3,55 +3,36 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-# Definimos la función de activación. El teorema nos dice que debe ser continua y de tipo sigmoidal.
-def activation(x): 
+# Funciones de Activación
+def sigmoid(x): 
     # Función Sigmoide
     y = 1 / (1 + np.exp(-x))
     return y
 
 
-# Construimos la red neuronal. 
-def model(x, theta, func=activation):
-    # Se ve sencilla porque es una neurona.
-    c = theta[0]
-    w = theta[1]
-    b = theta[2]
-    v = w * x + b
-    y = c * func(v)
-    return y
-
-
-# Función de Error
-def MSE_nn(yv, xv, m, pars):
-    M = len(yv)
-    assert M == len(xv), "Revisa dimensiones"
-    pred = np.array([m(x, pars) for x in xv])
-    ell = (yv-pred) ** 2
-    Lambda = M ** (-1) * ell.sum()
-    return Lambda
-
-
-# Algoritmo de Optimización
-def descent_gradent(func, theta0, epsilon, stop = 100, lr = 0.01):
+# Algoritmos de Oprimización
+def descent_gradent(func, theta0, epsilon, lr = 0.01):
+    """
+        Algoritmo del Gradiente Descendiente
+        func: Función a minimizar
+        theta0: Parámetro inicial
+        epsilon: Error
+        lr: Tasa de Arendizaje
+    """
     error = func(theta0)
     epochs = 0
     while error > epsilon:
-        if epochs > stop:
-            break
         thetan = theta0 - lr * gradient(func, theta0)
         error = func(thetan)
+        t_n1 = np.array(thetan)
+        t_n = np.array(theta0)
+        diff = (t_n1 - t_n) ** 2
+        near = np.sqrt(diff.sum())
+        if near < epsilon:
+            break
         theta0 = thetan
-        if epochs > 1000:
-            print("Error:", error)
+        if epochs % 1000 == 0:
+            print(epochs, near)
         epochs+=1
+    print("Error", error)
     return theta0
-
-
-def verif_model(y, x, model, pars, crit):
-    predicted = [model(t) for t in x]
-    fig, ax = plt.subplots()
-    ax.plot(x, predicted, color="blue", label="Red Neuronal")
-    ax.plot(x, y, color="green", label="Entrenamiento")
-    ax.annotate(text=f"MSE={crit(pars):2f}", xy=[-3,0.75])
-    fig.suptitle("Red Neuronal vs Entrenamiento")
-    ax.legend()

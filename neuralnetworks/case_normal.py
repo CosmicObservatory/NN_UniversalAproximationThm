@@ -1,6 +1,5 @@
 import numpy as np
 from neuralnetworks.maths import riemann
-from neuralnetworks.nn import MSE_nn, model
 # Función a estimar. 
 def densnormal(x):
     # Función de densidad de N(0,1)
